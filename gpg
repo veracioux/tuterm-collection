@@ -1,0 +1,173 @@
+#!/usr/bin/env tuterm
+
+# tuterm-collection
+#
+# Copyright (c) 2021 The Tuterm Collection Contributors
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+# TODO This script currently works only in tutorial mode. That is because gpg
+# asks the user to enter information interactively (and even prompts for a
+# password). We can try to solve this using expect or some other way, e.g.
+# generating the keys beforehand and then pretending that gpg created them.
+
+configure() {
+    TUTERM_NAME='gpg-tutorial'
+}
+depends() {
+    echo 'gpg'
+}
+
+# TODO A newer version of tuterm will add automatic dependency checks. For now
+# we add it manually.
+which $(depends) 2>/dev/null ||\
+    { echo -e "Dependencies not satisfied:\n$(depends)" >&2; exit 1; }
+
+fake_home
+
+prepare_file() {
+    {
+    echo -e "This is some random text that has been added for your convenience."
+    echo -e "Save it and quit the editor."
+    } > file
+}
+
+# Only in demo mode
+gpg_gen_key() {
+    gpg --batch --generate-key <(echo "
+Key-Type: RSA
+Name-Real: $1
+Name-Email: example@foo.bar
+Passphrase: abc"
+) >/dev/null 2>/dev/null
+}
+
+gpg_no_pass() {
+    gpg --pinentry-mode=loopback --passphrase abc "$@"
+}
+
+# A smart way to call gpg. It automatically performs additional actions based on
+# the current mode
+gpg_do() {
+    if mode 'demo'; then
+        e gpg "$@"
+        gpg_no_pass "$@"
+    else
+        c gpg "$@"
+    fi
+}
+
+run() {
+    m "Welcome to GPG tutorial"
+    echo
+
+    # KEYPAIRS
+
+    M "Generate a key pair."
+    M "GPG will ask you for some info."
+    m "Make sure that you enter your real name as MyName for the purposes of this tutorial."
+    m "Also set an easy password for the purposes of the tutorial."
+    if mode 'demo'; then
+        e gpg --gen-key
+        gpg_gen_key MyName
+    else
+        c gpg --gen-key
+    fi
+    echo
+
+    M "Two keys have been generated for the chosen identity:"
+    echo
+    M "1. A public key, which you can share with anyone"
+    c gpg --list-public-keys
+    M "2. A secret key, which you must NEVER SHARE WITH ANYONE"
+    c gpg --list-secret-keys
+    m "NOTE: when you run this for real, there may be other keys that have been installed by other programs"
+
+    M "Now let's create a random text file and edit it with your favorite editor."
+    prepare_file
+    if mode 'tut'; then
+        c "$EDITOR" file
+    else
+        e "$EDITOR" file
+        # TODO When we allow this if block to execute, then the cmdline commands
+        # called afterwards misbehave. So we disable it for now, until we figure
+        # out what's wrong
+        if false; then
+        # if ! option 'fast'; then
+            sleep 0.5
+            bash -i -c 'timeout 3 "$EDITOR" file'
+        fi
+    fi
+
+    # ENCRYPTION
+
+    M "Now we will encrypt the file using the key pair we generated."
+    M "You have to specify a recipient -- whose key should be used."
+    M "There are more ways to do that, but the easiest one is to use the real name."
+    c gpg --encrypt --recipient MyName file
+    c ls
+    M "The encrypted file is stored as file.gpg. If we try to read it, we'll see gibberish."
+    M "We can set the output to another file instead."
+    c gpg -e -r MyName --output other.gpg file
+    M "Note that options cannot come after positional arguments, which is a little annoying."
+    c ls
+    M "Let's decrypt the file."
+    gpg_do --decrypt -r MyName file.gpg
+    M "See? It matches the content of the original file."
+    M "We can also tell gpg to store the output to a file"
+    gpg_do -d -r MyName --output decrypted file.gpg
+    c cat decrypted
+
+    return # TODO implement the remainder
+
+    M "Now let's checkout some other features of gpg"
+    M "First up: signing"
+    option 'fast' || { sleep 1s; clear -x; }
+
+    # VERIFYING
+
+    M "Say you received some file from someone and you want to verify if it really is from them."
+    M "You will need their public GPG key."
+    M "This will usually be provided to you as a .asc file"
+    rm *
+    gpg_gen_key Friend
+    gpg --export -o friend.asc Friend
+    echo "Hello, friend" > friend
+    gpg_no_pass -r Friend --sign friend
+    rm friend
+    M "We have created one for you (friend.asc), as well as a signed file (friend.gpg)."
+    c ls
+    M "Let's check the information for the key"
+    c gpg friend.asc
+    M "Now we can verify that the file really is from 'Friend'"
+    c gpg --verify friend.gpg
+    M "The signed file and the file signature have the same name."
+    M "That's why we have to specify only the signed file."
+    c mv friend.gpg friend-file.gpg
+    M "If the file names don't match, we have to import the key first."
+    c gpg --verify friend-file.gpg
+
+    # Short versions
+    m -e "\nIt's useful to know the short versions for some options:"
+    m -e "--list-public-keys\t -k"
+    m -e "--list-secret-keys\t -K"
+    m -e "--recipient       \t -r"
+    m -e "--encrypt         \t -e"
+    m -e "--output          \t -o"
+}
