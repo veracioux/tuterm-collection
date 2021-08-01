@@ -1,0 +1,92 @@
+#!/usr/bin/env tuterm
+
+configure() {
+    TUTERM_NAME='tar'
+}
+
+fake_home
+mkdir dir dir/subdir
+touch dir/file1 dir/file2 dir/subdir/file3
+
+create_archive() {
+    rm -rf *
+    touch photo.jpg notes.txt
+    tar -cf archive.tar photo.jpg notes.txt
+    rm photo.jpg notes.txt
+}
+
+run() {
+    # set_option mode 'demo'  # TODO
+    # set_option fast 'true'  # TODO
+    M -e "Welcome to tar tutorial"
+    # Create
+    M "Let's start by creating an uncompressed archive in my-archive.tar"
+    c ls
+    c tar --create --file archive.tar dir/
+    c ls
+    M "Short options are more convenient. Let's create the archive again."
+    c tar -c -f archive.tar dir/
+    M "We can shorten it even further:"
+    c tar cf archive.tar dir/
+    M "The --verbose option (short: v) prints the details of the command"
+    c tar cvf archive.tar dir/
+    M "(This option works with any command)"
+    echo
+    M "To create a gzipped (compressed) archive you can use --gzip or z"
+    c tar cfz archive.tar.gz dir/
+    M "(More formats are available other than gzip. Consult the man page.)"
+    # List
+    M "The contents of an archive can be listed with --list (or t for short)"
+    c tar tf archive.tar.gz
+    M "You can restrict the matched files (like the ls command)"
+    c tar tf archive.tar.gz dir/subdir/
+
+    create_archive
+
+    # Extract
+    echo
+    M "This time we'll start from an existing archive..."
+    c ls
+    M "Extract the contents using --extract (short: x)"
+    c tar xvf archive.tar
+    M "You can also specify a destination directory"
+    c mkdir destination
+    c tar xf archive.tar -C destination/
+    c ls destination/
+
+    rm -rf *
+    touch file1 file2 file3
+    tar cf archive.tar *
+
+    m "-- We have cleaned up the directory and created a new archive for you. --"
+    m "Let's see its contents"
+    c tar tf archive.tar
+    M "If you want to extract only some files:"
+    c tar xvf archive.tar file1 file2
+    M "Wildcards are also supported, but must be quoted."
+    c "tar xvf archive.tar --wildcards '*1' '*2'"
+    M "(This has the same effect as the previous command)"
+    M "(Wildcards can also be used with other tar operations)"
+
+    # Append
+    echo
+    rm -rf *
+    create_archive
+    m "-- We have changed the contents of the archive for you again. --"
+    c tar tf archive.tar
+    set_option mode 'tutorial' # TODO
+    M "You can add new files to an existing archive using --append (short: r)"
+    c touch newfile
+    c tar rf archive.tar newfile
+    M "Check the new contents:"
+    c tar tf archive.tar
+
+    echo
+    m "Things to remember:"
+    m -e "\tCreating archives:\t\t --create      -c    c"
+    m -e "\tExtracting archives:\t\t --extract     -x    x"
+    m -e "\tListing archive content:\t --list        -t    t"
+    m -e "\tPrint details:\t\t\t --verbose     -v    v"
+    m -e "\tWildcards:\t\t\t --wildcards"
+}
+
