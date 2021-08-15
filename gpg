@@ -27,6 +27,8 @@
 # password). We can try to solve this using expect or some other way, e.g.
 # generating the keys beforehand and then pretending that gpg created them.
 
+depends gpg
+
 configure() {
     TUTERM_NAME='gpg-tutorial'
 }
