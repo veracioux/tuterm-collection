@@ -28,10 +28,6 @@ configure() {
     TUTERM_NAME='tar'
 }
 
-fake_home
-mkdir dir dir/subdir
-touch dir/file1 dir/file2 dir/subdir/file3
-
 create_archive() {
     rm -rf *
     touch photo.jpg notes.txt
@@ -40,6 +36,8 @@ create_archive() {
 }
 
 run() {
+    mkdir dir dir/subdir
+    touch dir/file1 dir/file2 dir/subdir/file3
     # set_option mode 'demo'  # TODO
     # set_option fast 'true'  # TODO
     M -e "Welcome to tar tutorial"

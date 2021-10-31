@@ -41,8 +41,6 @@ depends() {
 which $(depends) 2>/dev/null ||\
     { echo -e "Dependencies not satisfied:\n$(depends)" >&2; exit 1; }
 
-fake_home
-
 prepare_file() {
     {
     echo -e "This is some random text that has been added for your convenience."
@@ -82,9 +80,9 @@ run() {
     # KEYPAIRS
 
     M "Generate a key pair."
-    M "GPG will ask you for some info."
-    m "Make sure that you enter your real name as MyName for the purposes of this tutorial."
-    m "Also set an easy password for the purposes of the tutorial."
+    M "- GPG will ask you for some info."
+    m "- Make sure that you enter your real name as MyName for the purposes of this tutorial."
+    m "- Also set an easy password for the purposes of the tutorial."
     if mode 'demo'; then
         e gpg --gen-key
         gpg_gen_key MyName

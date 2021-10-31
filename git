@@ -28,9 +28,6 @@ configure() {
     TUTERM_NAME="git-$(mode)"
 }
 
-# This is essential!
-fake_home
-
 run() {
     git config --global user.name "Tutor"
     git config --global user.email "tutor@tuterm.io"
