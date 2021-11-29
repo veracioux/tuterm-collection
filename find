@@ -1,0 +1,60 @@
+#!/usr/bin/env tuterm
+
+# tuterm-collection
+#
+# Copyright (c) 2021 The Tuterm Collection Contributors
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+depends find
+
+configure() {
+    TUTERM_NAME="find-tutorial"
+}
+
+run() {
+    m 'Welcome to tutorial of the `find` command!'
+    m "The find command is used to search and locate the list of files"
+    m "and directories based on specified conditions"
+    echo
+    M "Let's find all files in the system directory containing startup scripts"
+    M 'Repeat after me:'
+    c find /etc/init.d -type f
+    M "Let's find out which of them are shell scripts"
+    c find /etc/init.d -type f -name "*.sh"
+    M "Let's find all files with permission to be executed in directory /etc"
+    c find /etc -type f -perm /a=x
+    M 'Now find the files with 777 permission in directory /etc'
+    c find /etc -type f -perm 777
+    M "Find read-only files in directory /etc"
+    c find /etc -type f -perm /u=r
+    M "Find all empty files in directory /etc"
+    c find /etc -type f -empty
+    M "Find all empty subdirectories in directory /etc"
+    c find /etc -type d -empty
+    M "Find all hidden files in directory /etc"
+    c find /etc -type f -name ".*"
+    M "Find all files in directory /etc owned by root"
+    c find /etc -type f -user root
+    M "Find all files in home directory sized at least 5MB and at most 10MB"
+    c find /home -type f -size +5M -size -10M
+    M "Find all files in home directory which are modified more than 2 days back"
+    M "and less than 20 days"
+    c find /home -mtime +2 -mtime -20
+}
