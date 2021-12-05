@@ -29,32 +29,41 @@ configure() {
 }
 
 run() {
+    mkdir dir dir/subdir dir/empty_dir
+    touch dir/readonly_file1 dir/nonempty_file2 dir/subdir/file3
+    tr -dc A-Za-z0-9 </dev/urandom | head -c 1024 > dir/nonempty_file2.txt
+    touch dir/executable_file4.sh dir/executable_file5.sh dir/executable_file6.sh
+    touch dir/.hidden_file7.txt
+    touch -d "10 days ago" dir/old_file7.txt
+    chmod +x dir/executable_file4.sh dir/executable_file5.sh dir/executable_file6.sh
+    chmod 0444 dir/readonly_file1
+    chmod 0777 dir/old_file7.txt
     m 'Welcome to tutorial of the `find` command!'
     m "The find command is used to search and locate the list of files"
     m "and directories based on specified conditions"
     echo
-    M "Let's find all files in the system directory containing startup scripts"
+    M "We created a new directory named dir for you convenience, it will be removed automatically after you finish this tutorial."
+    M "Let's find all files in this directory."
     M 'Repeat after me:'
-    c find /etc/init.d -type f
+    c find ./dir -type f
     M "Let's find out which of them are shell scripts"
-    c find /etc/init.d -type f -name "*.sh"
-    M "Let's find all files with permission to be executed in directory /etc"
-    c find /etc -type f -perm /a=x
-    M 'Now find the files with 777 permission in directory /etc'
-    c find /etc -type f -perm 777
-    M "Find read-only files in directory /etc"
-    c find /etc -type f -perm /u=r
-    M "Find all empty files in directory /etc"
-    c find /etc -type f -empty
-    M "Find all empty subdirectories in directory /etc"
-    c find /etc -type d -empty
-    M "Find all hidden files in directory /etc"
-    c find /etc -type f -name ".*"
-    M "Find all files in directory /etc owned by root"
-    c find /etc -type f -user root
-    M "Find all files in home directory sized at least 5MB and at most 10MB"
-    c find /home -type f -size +5M -size -10M
-    M "Find all files in home directory which are modified more than 2 days back"
+    c find ./dir -type f -name \"*.sh\"
+    M "Let's find all files with permission to be executed in directory ./dir"
+    c find ./dir -type f -perm /a=x
+    M 'Now find the files with 777 permission in directory ./dir'
+    c find ./dir -type f -perm 777
+    M "Find read-only files in directory ./dir"
+    c find ./dir -type f -perm /u=r
+    M "Find all empty files in directory ./dir"
+    c find ./dir -type f -empty
+    M "Find all empty subdirectories in directory ./dir"
+    c find ./dir -type d -empty
+    M "Find all hidden files in directory ./dir"
+    c find ./dir -type f -name \".*\"
+    M "Find all files in ./dir directory sized at least 0MB and at most 10MB"
+    c find ./dir -type f -size +0M -size -10M
+    M "Find all files in ./dir directory which are modified more than 2 days back"
     M "and less than 20 days"
-    c find /home -mtime +2 -mtime -20
+    c find ./dir -mtime +2 -mtime -20
+    rm -rf dir
 }
