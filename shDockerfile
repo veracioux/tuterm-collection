@@ -1,0 +1,17 @@
+[ -z "$ver" ] && ver=latest
+[ -z "$os" ] && os="" || os="-$os"
+
+FROM "tuterm:$ver$os"
+
+WORKDIR /collection
+
+RUN 'rm -rf *'
+COPY . .
+
+USER root
+RUN chown -R user .
+
+USER user
+CMD sh
+
+TAG tuterm-collection:"$ver$os"
