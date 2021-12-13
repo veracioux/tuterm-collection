@@ -1,0 +1,109 @@
+#!/usr/bin/env tuterm
+
+# tuterm-collection
+#
+# Copyright (c) 2021 The Tuterm Collection Contributors
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+depends grep
+
+configure() {
+    TUTERM_NAME="grep-tutorial"
+}
+
+run() {
+    mkdir dir dir/p1 dir/p2
+
+    cat <<< "
+In the stump of the old tree,
+where the heart has rotted out,
+there is a hole the length of a man's arm,
+and a dank pool at the bottom of it where the rain gathers,
+and the old leaves turn into lacy skeletons.
+But do not put your hand down to see,
+Because
+In the stump of the old tree,
+where the heart has rotted out,
+there is a hole the length of a man's arm,
+and a dank pool at the bottom of it where the rain gathers,
+and the old leaves turn into lacy skeletons.
+But do not put your hand down to see,
+because
+in the stumps of old trees with rotten hearts,
+where the rain gathers and the laced leaves and the dead bird like a trap,
+there are holes the length of a man's arm,
+and in every crevice of the rotten wood grow weasel's eyes like molluscs,
+their lids open and shut with the tide. But do not put your hand down to see,
+because
+in the stumps of old trees where the hearts have rotted out there are holes the length of a man's arm where the weasels
+are trapped and the letters of the rook language are laced on the sodden leaves,
+and at the bottom there is a man's arm.
+But do not put your hand down to see,
+because
+
+he stump
+    " > dir/p1/p1.txt
+
+    cat <<< "
+in the stumps of old trees where the hearts have rotted out there are deep holes and dank pools where the rain gathers,
+and if you ever put your hand down to see,
+you can wipe it in the sharp grass till it bleeds,
+but you'll never want to eat with it again.
+    " > dir/p2/p2.txt
+
+    m 'Welcome to tutorial of the `grep` command!'
+    m "Grep utility is a powerful file processing tool used to find patterns in text files."
+    M "We created a new directory named dir for you convenience, it will be removed automatically after you finish this tutorial."
+    M "Let's search any line that contains the substring 'he stump' in ./dir/p1/p1.txt"
+    M 'Repeat after me:'
+    c grep \"he stump\" ./dir/p1/p1.txt
+    M "As we can see, the previous command matched the substring ignoring word boundaries."
+    M "However, we can add this constraint with flag -w"
+    c grep -w \"he stump\" ./dir/p1/p1.txt
+    M "Grep supports searching by regular expressions, which is more flexible than finding substrings or words."
+    M "Let's find all lines beginning with 'and'."
+    c grep  \"^and\" ./dir/p1/p1.txt
+    M "Let's find all lines ending with 'use'."
+    c grep  \"use$\" ./dir/p1/p1.txt
+    M "The start and end matching rules can be applied not only to lines, but also to words."
+    M "Let's find all lines containing words beginning with 'tre'"
+    c grep \"\\\<tre\" ./dir/p1/p1.txt
+    M "Let's find all lines containing words ending with 'es'"
+    c grep \"es\\\>\" ./dir/p1/p1.txt
+    M "Wildcard character '.' is used to match any single character."
+    c grep  \".ut\" ./dir/p1/p1.txt
+    M "A '*' after a character or group of characters is used to allow matching zero or more instances of the preceding pattern."
+    c grep  \"and.*like\" ./dir/p1/p1.txt
+    M "Now, when we covered basics of regex, let's explore the most useful flags of grep command."
+    M "Flag -n displays the lines containing the pattern along with the line numbers"
+    c grep -n \"the stump\" ./dir/p1/p1.txt
+    M "Flag -i allows to perform a case-insensitive search"
+    c grep -i \"because\" ./dir/p1/p1.txt
+    M "Flag -c counts the total number of times that the string appears in a file"
+    c grep -c \"and\" ./dir/p1/p1.txt
+    M "Flag -v allows to find lines NOT containing pattern"
+    c grep -v \"and\" ./dir/p1/p1.txt
+    M "To search pattern in multiple files recursively, we use the -r flag"
+    c grep -r  \"rain\" ./dir
+    M "We can also combine flags, let's search for word 'dank' recursively, displaying line numbers"
+    c grep -rnw  \"dank\" ./dir
+
+    rm -rf dir
+}
