@@ -41,6 +41,8 @@ run() {
     M "It's easy to see what branch we are on using the status command:"
     c git status
     M "The first line shows us that we are on the main branch."
+    M "Let's create two files:"
+    c touch file1 file2
     M "Now, we will stage and commit file1 and file2:"
     c git add file1 file2
     c git commit -m '"Initial commit"'
@@ -77,7 +79,7 @@ run() {
     M "If we look at the list of files we'll see our new file on the main branch:"
     c git ls-tree --name-only main
     M "And now we can delete that working branch:"
-    c git branch -D first-branch
+    c git branch -d first-branch
     M "Looking at the list of branches we see that we have just the main and second-branch left:"
     c git branch
     M "That's all for the branches tutorial! Let's clean up the files:"
