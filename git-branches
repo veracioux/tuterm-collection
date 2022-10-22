@@ -1,0 +1,88 @@
+#!/usr/bin/env tuterm
+
+# tuterm-collection
+#
+# Copyright (c) 2021 The Tuterm Collection Contributors
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+depends git
+
+configure() {
+    TUTERM_NAME="git-branches-$(mode)"
+}
+
+run() {
+    git config --global user.name "Tutor"
+    git config --global user.email "tutor@tuterm.io"
+    git config --global init.defaultBranch 'main'
+    m 'Welcome to the git branches tutorial!'
+    m "We are going to learn how to create, checkout, merge and delete branches."
+    echo
+    M "First, we'll create a git repository in the current directory."
+    M 'Type git init to intialize the repo:'
+    c git init
+    M "It's easy to see what branch we are on using the status command:"
+    c git status
+    M "The first line shows us that we are on the main branch."
+    M "Let's create two files:"
+    c touch file1 file2
+    M "Now, we will stage and commit file1 and file2:"
+    c git add file1 file2
+    c git commit -m '"Initial commit"'
+    echo
+    M "Before we start making changes, we will create our own branch."
+    M "This way we can make changes without affecting the main branch."
+    c git branch first-branch
+    echo
+    M 'We are still on the main branch. To switch to the new branch:'
+    c git checkout first-branch
+    echo
+    M 'You can also create and switch to a new branch in one command:'
+    c git checkout -b second-branch
+    M "Let's see a list of all of our branches:"
+    c git branch
+    M "The branch with an asterisk (*) next to it is the branch we are on."
+    M "We will do some work on our first branch. Use checkout to switch back to it:"
+    c git checkout first-branch
+    M "And now we will add a file to this branch:"
+    c touch new-file
+    M "Remember that you can check the status at any time to see the current branch and files:"
+    c git status
+    echo
+    M "We are on new-branch and can see our new file in the list of untracked files."
+    M "Let's move that file to the staging area so we can commit the changes:"
+    c git add new-file
+    M "Now commit the changes:"
+    c git commit -m '"Add new file"'
+    echo
+    M "When our work is done on this file, we will merge it to the main branch."
+    M "We first move back to the main branch and then use the merge command:"
+    c git checkout main
+    c git merge first-branch
+    M "If we look at the list of files we'll see our new file on the main branch:"
+    c git ls-tree --name-only main
+    M "And now we can delete that working branch:"
+    c git branch -d first-branch
+    M "Looking at the list of branches we see that we have just the main and second-branch left:"
+    c git branch
+    M "That's all for the branches tutorial! Let's clean up the files:"
+    c rm -fr .git new-file
+    echo # newline
+}
